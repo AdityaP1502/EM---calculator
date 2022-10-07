@@ -2,11 +2,13 @@ from math import cos, sin
 from Math.Calculator import Calculator
 from Math.Vector import Vector
 from Medium import Medium
+from UI.UI import UI
 class Solve():
-  def __init__(self, mode, data) -> None:
+  def __init__(self, mode : int, data : any, ui : UI) -> None:
     self.mode = mode
     self.data = data
     self.result = None
+    self.log = ui
     
   # helper function
   def __setState(self, mediums : list[Medium]):
@@ -73,12 +75,13 @@ class Solve():
     self.__solveRoutine_mode1()
   
   def __solveRoutine_mode3(self):
-    def findReflectedWave(isNormal : bool):
+    def findReflectedWave():
       # tangential set component at v3 = 0
       
       # reflected coefficient
-      coefTangential = Calculator.getReflectedCoef(False, incidentAngle, transmittedAngle, *mediums)
-      coefNormal = Calculator.getReflectedCoef(True, incidentAngle, transmittedAngle, *mediums)
+      medium_resistances = [x.resistance for x in mediums]
+      coefTangential = Calculator.getReflectedCoef(False, incidentAngle, transmittedAngle, *medium_resistances)
+      coefNormal = Calculator.getReflectedCoef(True, incidentAngle, transmittedAngle, *medium_resistances)
       
       # find direction vector reflected
       # flip the component in v1 
@@ -96,8 +99,9 @@ class Solve():
       return reflectedWaveTangential + reflectedWaveNormal, dirVectorNew
     
     def findTransmittedWave():
-      coefTangential = Calculator.getTransmittedCoef(False, incidentAngle, transmittedAngle, *mediums)
-      coefNormal = Calculator.getTransmittedCoef(True, incidentAngle, transmittedAngle, *mediums)
+      medium_resistances = [x.resistance for x in mediums]
+      coefTangential = Calculator.getTransmittedCoef(False, incidentAngle, transmittedAngle, *medium_resistances)
+      coefNormal = Calculator.getTransmittedCoef(True, incidentAngle, transmittedAngle, *medium_resistances)
       
       # direction vector has the same mag just different direction
       signX = -1 if dirVector.x < 1 else 1
@@ -139,10 +143,11 @@ class Solve():
     # find incident angle and transmitted angle
     # incident angle is the angle between dir vector and v1
     incidentAngle = dirVector.angle(v1) # in radians
-    transmittedAngle = Calculator.getTransmittedAngle(incidentAngle, *mediums)
+    medium_propagations = [x.propagation for x in mediums]
+    transmittedAngle = Calculator.getTransmittedAngle(incidentAngle, *medium_propagations)
     
     # find tangential component and normal component
-    electricFieldTangential = electriFieldNew * 1 # copy the vector
+    electricFieldTangential = electriFieldNew * 1 # copy the vector       
     electricFieldTangential.z = 0
       
     # normal component set v1 = 0 and v2 = 0
@@ -157,9 +162,18 @@ class Solve():
     # revert all vector back to ax, ay and az
     vectors = [reflectedWave, transmittedWave]
     self.result =  [
-      [Vector.revertChangeBasis(p, [v1, v2, v3]). Vector.revertChangeBasis(q, [v1, v2, v3])] 
+      [Vector.revertChangeBasis(p, [v1, v2, v3]), Vector.revertChangeBasis(q, [v1, v2, v3])] 
       for (p, q) in vectors
     ] 
+  
+  def __getResult_mode3(self):
+    # type hint 
+    self.result : list[list[Vector]]
+    
+    self.log.showResult(data_name="Reflected electric field vector", values=self.result[0][0].serialize())
+    self.log.showResult(data_name="Reflected wave direction vector", values=self.result[0][1].serialize())
+    self.log.showResult(data_name="Transmitted electric field vector", values=self.result[1][0].serialize())
+    self.log.showResult(data_name="Transmitted wave direction vector", values=self.result[1][1].serialize())
     
   def solve(self):
     if (self.mode == 1):
@@ -170,3 +184,4 @@ class Solve():
       
     elif self.mode == 3:
       self.__solveRoutine_mode3()
+      self.__getResult_mode3()
