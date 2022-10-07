@@ -4,6 +4,7 @@ from UI.Color import Color
 class UI(Color):
   def __init__(self, color_pallete : str) -> None:
     super().__init__()
+    system("")
     self.themes = self.color_palletes.get(color_pallete, None)
     if self.themes == None:
       raise Exception("Unrecognized Themes")
@@ -94,15 +95,13 @@ class UI(Color):
     if colors == None:
       colors = self.generateColors(len(data_parameters), self.themes)
     
-    print(colors)
     input_prompt = self.__dataFormatString(data_name, extra_info_prepend, extra_info_append, data_parameters, colors)
     print(input_prompt)
     
     parameter = input("Please input the parameter:\n>").split(" ")
     return parameter
   
-  @staticmethod
-  def read(prompt : str) -> str:
+  def read(self, prompt : str) -> str:
     """Read user input for a given prompt. Only take one value as data. 
 
     Args:
@@ -114,14 +113,13 @@ class UI(Color):
     
     return input(prompt + "\n>")
 
-@staticmethod
-def showResult(data_name : str, values : any):
-  """print result in given format
-     "data_name: values"
+  def showResult(self, data_name : str, values : any):
+    """print result in given format
+       "data_name: values"
 
-  Args:
-      data_name (str): data name
-      values (any): the value of the data
-  """
+    Args:
+        data_name (str): data name
+        values (any): the value of the data
+    """
   
-  print("{}: {}".format(data_name, values))
+    print("{}: {}".format(data_name, values))
