@@ -115,7 +115,7 @@ class Vector():
         b (Vector): Other vector
 
     Returns:
-        float: angle between a and b
+        float: angle between a and b (in radians)
     """
     
     cos_theta = self.dotProduct(b) / (self.mag * b.mag)
