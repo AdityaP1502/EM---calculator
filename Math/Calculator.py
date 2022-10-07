@@ -1,6 +1,7 @@
 import cmath
-from math import degrees, pi, radians, sqrt, atan
-from Math.Vector import Vector
+from math import asin, cos, degrees, pi, radians, sin, sqrt, atan
+
+from Medium import Medium
 
 class Calculator():
   """
@@ -146,3 +147,39 @@ class Calculator():
     b = 1 + inter_reflection
     c = (a / b) * cmath.exp(-1* medium.propagation * medium.distance) * incident_amplitude_last_medium
     return c
+  
+  # Medan Bab 6
+  def getTransmittedAngle(incident_angle : float, medium_1 : Medium, medium_2 : Medium) -> float:
+    # incident angle on radian
+    a = (medium_1.propagation.imag / medium_1.propagation.imag) * sin(incident_angle)
+    
+    # returned angle is on radian
+    return asin(a)
+  
+  def getReflectedCoef(isNormal : bool, incident_angle : float, transmitted_angle : float, medium_1 : Medium, medium_2 : Medium):
+    f = cos(transmitted_angle)
+    g = cos(incident_angle)
+    
+    if isNormal:
+      a = medium_2.resistance * g - medium_1.resistance * f
+      b = medium_2.resistance * g + medium_1.resistance * f
+      return a / b
+    
+    a = medium_2.resistance * f - medium_1.resistance * g
+    b = medium_2.resistance * f + medium_1.resistance * g
+    
+    return -(a / b)  
+  
+  def getTransmittedCoef(isNormal : bool, incident_angle : float, transmitted_angle : float, medium_1 : Medium, medium_2 : Medium):
+    # all angle is on radian
+    f = cos(transmitted_angle)
+    g = cos(incident_angle)
+    
+    a = 2 * medium_2.resistance * g
+    
+    if isNormal:
+      b = medium_2.resistance * g + medium_1.resistance * f
+      return a / b
+    
+    b = medium_2.resistance * f + medium_1.resistance * g
+    return a / b
