@@ -2,7 +2,7 @@ from Math.Calculator import Calculator
 from UI.UI import UI
 from Medium import Medium
 
-class Init():
+class Routine():
   @staticmethod
   def __readOmega(ui : UI):
     freq = ui.read("Input wave frequency in Hz")
@@ -82,17 +82,17 @@ class Init():
   
   @staticmethod
   def __Mode1(ui : UI):
-    n, ampl, mediums = Init.__Mode2(ui)
-    reflection, inter_reflection = Init.__readReflectionCoefficient(ui, n)
+    n, ampl, mediums = Routine.__Mode2(ui)
+    reflection, inter_reflection = Routine.__readReflectionCoefficient(ui, n)
     
     return n, ampl, mediums, reflection, inter_reflection
   
   @staticmethod
   def __Mode2(ui : UI):
-    omega = Init.__readOmega(ui)
-    ampl = Init.__readIncidentWave(ui)
-    n = Init.__readTotalMedium(ui)
-    mediums = Init.__readMedium(ui, n, omega)
+    omega = Routine.__readOmega(ui)
+    ampl = Routine.__readIncidentWave(ui)
+    n = Routine.__readTotalMedium(ui)
+    mediums = Routine.__readMedium(ui, n, omega)
     
     return n, ampl, mediums
   
@@ -119,10 +119,10 @@ class Init():
     mode = ui.getOptions(prompt, options)
     
     if (mode == 1):
-      data = Init.__Mode1(ui)
+      data = Routine.__Mode1(ui)
       
     elif (mode == 2):
-      data = Init.__Mode2(ui)
+      data = Routine.__Mode2(ui)
       
       
     return mode, list(data)
