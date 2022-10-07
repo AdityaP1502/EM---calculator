@@ -1,16 +1,14 @@
-from re import S
+from math import cos, sin
 from Math.Calculator import Calculator
+from Math.Vector import Vector
 from Medium import Medium
-import cmath
-
 class Solve():
   def __init__(self, mode, data) -> None:
     self.mode = mode
     self.data = data
     self.result = None
+    
   # helper function
-  
-  
   def __setState(self, mediums : list[Medium]):
     """
     Generate value for total impedance and it's intermediate value
@@ -60,7 +58,6 @@ class Solve():
     
     self.result[-1][0] = self.result[-2][0] * (reflection[-1] + 1)
   
-  
   def __solveRoutine_mode2(self):
     """
       given medium find all amplitude 
@@ -75,12 +72,101 @@ class Solve():
     
     self.__solveRoutine_mode1()
   
-  def __solveRoutine_mode3():
-    pass
-  
+  def __solveRoutine_mode3(self):
+    def findReflectedWave(isNormal : bool):
+      # tangential set component at v3 = 0
+      
+      # reflected coefficient
+      coefTangential = Calculator.getReflectedCoef(False, incidentAngle, transmittedAngle, *mediums)
+      coefNormal = Calculator.getReflectedCoef(True, incidentAngle, transmittedAngle, *mediums)
+      
+      # find direction vector reflected
+      # flip the component in v1 
+      dirVectorNew = dirVector * 1
+      dirVectorNew.x *= -1
+      
+      # find reflected electric field
+      # reflected e field direction only has v2 component flipped for tangential
+      reflectedWaveTangential = electricFieldTangential * coefTangential
+      reflectedWaveTangential.y *= -1
+      
+      # normal just scale with the coef
+      reflectedWaveNormal = electricFieldNormal * coefNormal
+      
+      return reflectedWaveTangential + reflectedWaveNormal, dirVectorNew
+    
+    def findTransmittedWave():
+      coefTangential = Calculator.getTransmittedCoef(False, incidentAngle, transmittedAngle, *mediums)
+      coefNormal = Calculator.getTransmittedCoef(True, incidentAngle, transmittedAngle, *mediums)
+      
+      # direction vector has the same mag just different direction
+      signX = -1 if dirVector.x < 1 else 1
+      signY = -1 if dirVector.y < 1 else 1
+      
+      dx = dirVector.mag * signX * cos(transmittedAngle)
+      dy = dirVector.mag * signY * sin(transmittedAngle)
+      dz = 0
+      # create a new vector instance
+      dirVectorNew = Vector(dx, dy, dz)
+      
+      # Electric field has the same direction just different amplitude
+      transmittedWaveTangential = electricFieldTangential * coefTangential
+      transmittedWaveNormal = electricFieldNormal * coefNormal
+      
+      return transmittedWaveTangential + transmittedWaveNormal, dirVectorNew
+         
+    # type hint
+    mediums : list[Medium]
+    electricField : Vector
+    dirVector : Vector
+    boundaryNormalVector : Vector
+    
+    # unpack the data
+    mediums, electricField, dirVector, boundaryNormalVector = self.data
+    
+    # find POI
+    POINormalVector = Vector.normalized(dirVector.crossProduct(boundaryNormalVector))
+    
+    # Shift Coordinate
+    # NEW BASIS VECTOR
+    v1 = Vector.normalized(boundaryNormalVector) # tangential 
+    v2 = POINormalVector.crossProduct(v1) # tangential
+    v3 = POINormalVector # normal
+    
+    # Convert E in ax, ay, az into new basis vector v1, v2, v3
+    electriFieldNew = Vector.changeBasis(electricField, [v1, v2, v3])
+    
+    # find incident angle and transmitted angle
+    # incident angle is the angle between dir vector and v1
+    incidentAngle = dirVector.angle(v1) # in radians
+    transmittedAngle = Calculator.getTransmittedAngle(incidentAngle, *mediums)
+    
+    # find tangential component and normal component
+    electricFieldTangential = electriFieldNew * 1 # copy the vector
+    electricFieldTangential.z = 0
+      
+    # normal component set v1 = 0 and v2 = 0
+    electricFieldNormal = electriFieldNew * 1 # copy the vector
+    electricFieldNormal.x = 0; electricFieldNormal.y = 0
+    
+    # do calculation using new vector
+    # Calculation
+    reflectedWave = findReflectedWave()
+    transmittedWave= findTransmittedWave()
+    
+    # revert all vector back to ax, ay and az
+    vectors = [reflectedWave, transmittedWave]
+    self.result =  [
+      [Vector.revertChangeBasis(p, [v1, v2, v3]). Vector.revertChangeBasis(q, [v1, v2, v3])] 
+      for (p, q) in vectors
+    ] 
+    
   def solve(self):
     if (self.mode == 1):
       self.__solveRoutine_mode1()
       
     elif(self.mode == 2):
       self.__solveRoutine_mode2()
+      
+    elif self.mode == 3:
+      self.__solveRoutine_mode3()
