@@ -113,6 +113,15 @@ class UI(Color):
     """
     
     return input(prompt + "\n>")
+
+@staticmethod
+def showResult(data_name : str, values : any):
+  """print result in given format
+     "data_name: values"
+
+  Args:
+      data_name (str): data name
+      values (any): the value of the data
+  """
   
-def showResult():
-  pass
+  print("{}: {}".format(data_name, values))
