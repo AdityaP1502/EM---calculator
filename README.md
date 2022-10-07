@@ -5,7 +5,7 @@ Calcualtor for solving EM equations and problems.
 You can use this calculator to calculate problem given below:
 1. Transmited and reflected wave perpendicular to surface for multiple interface
 2. Transmited and reflected wave at any angle. Only for two medium
-</br>
+<br>
 __Notes__: For detailed explaination on implemented calculation and mode, refer to docs.
 
 # Installation
