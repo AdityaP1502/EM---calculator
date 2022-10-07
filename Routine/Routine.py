@@ -126,14 +126,18 @@ class Routine():
     n = 2 # only support for two medium
     omega = Routine.__readOmega(ui)
     electricField = Routine.__readIncidentWavePolarized(ui)
-    mediums = Routine.__readMedium(ui, n, omega) 
     dir_vector = Routine.__readDirectionVector(ui)
+    if ((dot := electricField.dotProduct(dir_vector)) != 0):
+      message = "Expected dot product: 0. received: {}.\nElectric Field isn't orthogonal with direction vector.".format(dot)
+      raise ValueError(message)
+    
+    mediums = Routine.__readMedium(ui, n, omega) 
     boundary_normal_vector = Routine.__readBoundaryPlane(ui)
     
     return mediums, electricField, dir_vector, boundary_normal_vector
   
   @staticmethod
-  def init() -> list[float]:
+  def init(ui : UI) -> list[float]:
     """Routine to read user input about data and problem type
 
     Returns:
@@ -141,10 +145,7 @@ class Routine():
     """
     
     data = None
-    
-    # create UI instance
-    ui = UI(color_pallete="purple")
-
+  
     # find type of calculation
     prompt = "Choose calculation mode below:"
     options = [
