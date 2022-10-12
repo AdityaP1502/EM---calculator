@@ -127,7 +127,7 @@ class Routine():
     omega = Routine.__readOmega(ui)
     electricField = Routine.__readIncidentWavePolarized(ui)
     dir_vector = Routine.__readDirectionVector(ui)
-    if ((dot := electricField.dotProduct(dir_vector)) != 0):
+    if ((dot := round(electricField.dotProduct(dir_vector))) != 0):
       message = "Expected dot product: 0. received: {}.\nElectric Field isn't orthogonal with direction vector.".format(dot)
       raise ValueError(message)
     
