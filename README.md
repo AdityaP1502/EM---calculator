@@ -4,9 +4,9 @@ Calcualtor for solving EM equations and problems.
 ## Supported Calculation
 You can use this calculator to calculate problem given below:
 1. Transmited and reflected wave perpendicular to surface for multiple interface
-2. Transmited and reflected wave at any angle. Only for two medium
+2. Transmited and reflected wave at any angle. Only for two medium. Support for general boundary plane(__not just in z = 0, y = 0, or x = 0__)
 <br></br>
-__Notes__: For detailed explaination on implemented calculation and mode, refer to docs.
+__Notes__: For detailed explaination on implemented calculation and mode, refer to docs. (For now the docs is incomplete)
 
 # Installation
 To install, just clone this repository
