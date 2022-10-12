@@ -23,3 +23,4 @@ __Notes__ : Tested on python 3.10.2. It seemed there are error on type alias whe
 # Further Works
 1. Complete the documentation
 2. Support for incidince angle greater than critical angle (mode 3)
+3. Support for a much more genereal surface, not just plane
