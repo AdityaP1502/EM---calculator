@@ -79,9 +79,13 @@ class Solve():
       # tangential set component at v3 = 0
       
       # reflected coefficient
-      medium_resistances = [x.resistance for x in mediums]
-      coefTangential = Calculator.getReflectedCoef(False, incidentAngle, transmittedAngle, *medium_resistances)
-      coefNormal = Calculator.getReflectedCoef(True, incidentAngle, transmittedAngle, *medium_resistances)
+      if (type(transmittedAngle) == complex):
+        coefTangential = 1
+        coefNormal = -1
+      else:
+        medium_resistances = [x.resistance for x in mediums]
+        coefTangential = Calculator.getReflectedCoef(False, incidentAngle, transmittedAngle, *medium_resistances)
+        coefNormal = Calculator.getReflectedCoef(True, incidentAngle, transmittedAngle, *medium_resistances)
       
       # find direction vector reflected
       # flip the component in v1 
@@ -99,6 +103,9 @@ class Solve():
       return reflectedWaveTangential + reflectedWaveNormal, dirVectorNew
     
     def findTransmittedWave():
+      if (type(transmittedAngle) == complex):
+        return Vector(0, 0, 0), Vector(0, 0, 0)
+
       medium_resistances = [x.resistance for x in mediums]
       coefTangential = Calculator.getTransmittedCoef(False, incidentAngle, transmittedAngle, *medium_resistances)
       coefNormal = Calculator.getTransmittedCoef(True, incidentAngle, transmittedAngle, *medium_resistances)
@@ -157,7 +164,7 @@ class Solve():
     # do calculation using new vector
     # Calculation
     reflectedWave = findReflectedWave()
-    transmittedWave= findTransmittedWave()
+    transmittedWave = findTransmittedWave()
     
     # revert all vector back to ax, ay and az
     vectors = [reflectedWave, transmittedWave]

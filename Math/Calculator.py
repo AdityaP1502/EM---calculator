@@ -150,6 +150,11 @@ class Calculator():
   # Medan Bab 6
   @staticmethod
   def getTransmittedAngle(incident_angle : float, medium_1_propagation : float, medium_2_propagation : float) -> float:
+    if medium_2_propagation.imag < medium_1_propagation.imag:
+      if incident_angle > Calculator.getCriticalAngle(medium_1_propagation, medium_2_propagation):
+        # no transmitted angle exist
+        return complex(0, 1)
+    
     # incident angle on radian
     a = (medium_1_propagation.imag / medium_2_propagation.imag) * sin(incident_angle)
     
@@ -185,3 +190,8 @@ class Calculator():
     
     b = medium_2_resistance * f + medium_1_resistance * g
     return a / b
+  
+  @staticmethod 
+  def getCriticalAngle(medium_1_propagation : float, medium_2_propagation : float):
+    return asin(medium_2_propagation.imag / medium_1_propagation.imag)
+  
