@@ -137,6 +137,13 @@ class Routine():
     return mediums, electricField, dir_vector, boundary_normal_vector
   
   @staticmethod
+  def __Mode4(ui : UI):
+    omega = Routine.__readOmega(ui)
+    n = Routine.__readTotalMedium(ui)
+    mediums = Routine.__readMedium(ui, n, omega)
+    return mediums
+    
+  @staticmethod
   def init(ui : UI) -> list[float]:
     """Routine to read user input about data and problem type
 
@@ -151,7 +158,8 @@ class Routine():
     options = [
       "Find reflected and transmitted wave given reflection coef", 
       "Reflected and transmitted wave full calculation", 
-      "Oblique Incidence"
+      "Oblique Incidence", 
+      "Calculate medium propagation and impedance", 
       ]
     mode = ui.getOptions(prompt, options)
     
@@ -163,6 +171,9 @@ class Routine():
       
     elif (mode == 3):
       data = Routine.__Mode3(ui)
+      
+    elif (mode == 4):
+      data = Routine.__Mode4(ui)
       
     return mode, list(data)
   

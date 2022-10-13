@@ -182,6 +182,14 @@ class Solve():
     self.log.showResult(data_name="Transmitted electric field vector", values=self.result[1][0].serialize())
     self.log.showResult(data_name="Transmitted wave direction vector", values=self.result[1][1].serialize())
     
+  def __getResult_mode4(self):
+    self.result : list[Medium] = self.data
+    for (i, medium) in enumerate(self.result):
+      self.log.showResult(data_name="Medium Propagation at {}".format(i + 1), values=medium.propagation)
+      self.log.showResult(data_name="Medium Propagation at {}(polar)".format(i + 1), values=Calculator.toPolar(medium.propagation, "DEGREES"))
+      self.log.showResult(data_name="Resisatnce at {}".format(i + 1), values=medium.resistance)
+      self.log.showResult(data_name="Resisatnce at {}(polar)".format(i + 1), values=Calculator.toPolar(medium.resistance, "DEGREES"))
+      
   def solve(self):
     if (self.mode == 1):
       self.__solveRoutine_mode1()
@@ -192,3 +200,7 @@ class Solve():
     elif self.mode == 3:
       self.__solveRoutine_mode3()
       self.__getResult_mode3()
+      
+    elif self.mode == 4:
+      self.__getResult_mode4()
+      
