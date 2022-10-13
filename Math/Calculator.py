@@ -133,18 +133,18 @@ class Calculator():
   
   # Reflected and Transmitted Amplitude
   @staticmethod
-  def evaluateReflective(curr_reflective : complex, curr_z : float, z : float, propagation_medium : complex):
+  def evaluateReflective(curr_reflective : complex, curr_z : float, z : float, propagation_medium : complex) -> complex:
     return curr_reflective * cmath.exp(-2 * propagation_medium * (z - curr_z))
 
   @staticmethod
-  def getReflectionAmplitude(reflection, incident_amplitude):
+  def getReflectionAmplitude(reflection : complex, incident_amplitude: complex) -> complex:
     return reflection * incident_amplitude
   
   @staticmethod
-  def getTransmittedAmplitude(reflection, inter_reflection, medium, incident_amplitude_last_medium):
+  def getTransmittedAmplitude(reflection : complex, inter_reflection : complex, medium_propagation : complex, medium_distance : float, incident_amplitude_last_medium : complex) -> complex:
     a = 1 + reflection
     b = 1 + inter_reflection
-    c = (a / b) * cmath.exp(-1* medium.propagation * medium.distance) * incident_amplitude_last_medium
+    c = (a / b) * cmath.exp(-1* medium_propagation * medium_distance) * incident_amplitude_last_medium
     return c
   
   # Medan Bab 6
@@ -162,7 +162,7 @@ class Calculator():
     return asin(a)
   
   @staticmethod
-  def getReflectedCoef(isNormal : bool, incident_angle : float, transmitted_angle : float, medium_1_resistance : complex, medium_2_resistance : complex):
+  def getReflectedCoef(isNormal : bool, incident_angle : float, transmitted_angle : float, medium_1_resistance : complex, medium_2_resistance : complex) -> complex:
     f = cos(transmitted_angle)
     g = cos(incident_angle)
     
@@ -177,7 +177,7 @@ class Calculator():
     return -(a / b)  
   
   @staticmethod
-  def getTransmittedCoef(isNormal : bool, incident_angle : float, transmitted_angle : float, medium_1_resistance : complex, medium_2_resistance : complex):
+  def getTransmittedCoef(isNormal : bool, incident_angle : float, transmitted_angle : float, medium_1_resistance : complex, medium_2_resistance : complex) -> complex:
     # all angle is on radian
     f = cos(transmitted_angle)
     g = cos(incident_angle)
@@ -192,6 +192,6 @@ class Calculator():
     return a / b
   
   @staticmethod 
-  def getCriticalAngle(medium_1_propagation : float, medium_2_propagation : float):
+  def getCriticalAngle(medium_1_propagation : float, medium_2_propagation : float) -> float:
     return asin(medium_2_propagation.imag / medium_1_propagation.imag)
   
