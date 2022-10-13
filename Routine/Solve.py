@@ -55,8 +55,8 @@ class Solve():
     self.result[0][1] = Calculator.getReflectionAmplitude(reflection[0], self.result[0][0])
     
     for i in range(1, n - 1):
-      self.result[i][0] = Calculator.getTransmittedAmplitude(reflection[i], inter_reflection[i], mediums[i], self.result[i - 1])
-      self.result[i][1] = Calculator.getReflectionAmplitude(reflection[i], self.result[i])
+      self.result[i][0] = Calculator.getTransmittedAmplitude(reflection[i - 1], inter_reflection[i - 1], mediums[i].propagation, mediums[i].distance, self.result[i - 1][0])
+      self.result[i][1] = Calculator.getReflectionAmplitude(reflection[i], self.result[i][0])
     
     self.result[-1][0] = self.result[-2][0] * (reflection[-1] + 1)
   
@@ -173,6 +173,16 @@ class Solve():
       for (p, q) in vectors
     ] 
   
+  def __getResult_mode2(self):
+    # type hint
+    self.result : list[list[Vector]]
+    
+    for (i, (ampl, reflected_ampl)) in enumerate(self.result):
+      self.log.showResult(data_name="Electric field at medium {} (Em{}+)".format(i + 1, i + 1), values=ampl)
+      self.log.showResult(data_name="Electric field at medium {} (Em{}+) in polar form(mag, angle)".format(i + 1, i + 1), values=Calculator.toPolar(ampl, "DEGREES"))
+      self.log.showResult(data_name="Reflected Electric field at medium {} (Em{}-)".format(i + 1, i + 1), values=reflected_ampl)
+      self.log.showResult(data_name="Reflected Electric field at medium {} (Em{}-) in polar form(mag, angle)".format(i + 1, i + 1), values=Calculator.toPolar(reflected_ampl, "DEGREES"))
+      
   def __getResult_mode3(self):
     # type hint 
     self.result : list[list[Vector]]
@@ -196,6 +206,7 @@ class Solve():
       
     elif(self.mode == 2):
       self.__solveRoutine_mode2()
+      self.__getResult_mode2()
       
     elif self.mode == 3:
       self.__solveRoutine_mode3()
