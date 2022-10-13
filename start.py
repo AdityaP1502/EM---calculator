@@ -1,7 +1,6 @@
-from Math.Calculator import Calculator
 from Routine.Routine import Routine
 from Routine.Solve import Solve
-from UI.UI import UI, Color
+from UI.UI import UI
 # User inteface and main files
 
 if __name__ == "__main__":
@@ -20,5 +19,4 @@ if __name__ == "__main__":
   solver = Solve(mode, data, ui)
   solver.solve()
   result = solver.result
-  
   
