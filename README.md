@@ -13,7 +13,7 @@ To install, just clone this repository
 ```
 git clone https://github.com/AdityaP1502/EM---calculator
 ```
-__No extra packages are needed__
+__No extra packages are needed__, unless you want to run experimental features. For experimental features, numpy is needed. 
 # Run
 to run the program, go to EM--calculator dir and run
 ```
