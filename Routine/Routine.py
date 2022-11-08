@@ -84,6 +84,36 @@ class Routine():
     
     return Vector(*vector_component)
   
+  @staticmethod
+  def __getMode(ui : UI):
+    mode = ui.getOptions("Stub mode", ["Paralel", "Series", "Multiple Paralel"])
+    if mode == 1:
+      return "PARALEL"
+    
+    elif mode == 2:
+      return "SERIES"
+    
+    elif mode == 3:
+      return "MULTIPLE PARALEL"
+    
+  @staticmethod
+  def __readLoad(ui : UI):
+    data_name = "Load Impedance (ZL)"
+    parameters = [['real', ""], ["imaginary", ""]]
+    extra_info_prepend = ""
+    extra_info_append = ""
+    
+    load_str = ui.getData(data_name, extra_info_prepend, extra_info_append, parameters)
+    load = list(map(lambda x: float(x), load_str))
+    
+    
+    return load
+  
+  @staticmethod
+  def __readIntrinsicImpedance(ui : UI):
+    impedance = ui.read("Impendance intrinsic of transmission lines")
+    return float(impedance)
+    
   @staticmethod 
   def __readIncidentWavePolarized(ui : UI) -> Vector:
     return Routine.__readVector(ui, "Electric Field")
@@ -142,6 +172,17 @@ class Routine():
     n = Routine.__readTotalMedium(ui)
     mediums = Routine.__readMedium(ui, n, omega)
     return mediums
+  
+  @staticmethod
+  def __Mode5(ui : UI):
+    
+    load = Routine.__readLoad(ui)
+    load = complex(load[0], load[1])
+    intrinsic_impedance = Routine.__readIntrinsicImpedance(ui)
+    
+    mode = Routine.__getMode(ui)
+    
+    return mode, load / intrinsic_impedance
     
   @staticmethod
   def init(ui : UI) -> list[float]:
@@ -160,6 +201,7 @@ class Routine():
       "Reflected and transmitted wave full calculation", 
       "Oblique Incidence", 
       "Calculate medium propagation and impedance", 
+      "Stub distance parameter in transmission lines",
       ]
     mode = ui.getOptions(prompt, options)
     
@@ -174,6 +216,9 @@ class Routine():
       
     elif (mode == 4):
       data = Routine.__Mode4(ui)
+      
+    elif (mode == 5):
+      data = Routine.__Mode5(ui)
       
     return mode, list(data)
   

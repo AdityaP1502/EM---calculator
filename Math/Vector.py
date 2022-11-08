@@ -31,6 +31,9 @@ class Vector():
   def __truediv__(self, b : float):
     return self.__mul__(1 / b)
   
+  def __repr__(self) -> str:
+    return "x: {}\ny:{}\nz:{}\n".format(self.x, self.y, self.z)
+
   def serialize(self) -> tuple[float, float, float]:
     """Serialize vector
 
@@ -106,7 +109,7 @@ class Vector():
     """
     
     distanceVector = b - self
-    return self.magnitude(distanceVector)
+    return distanceVector.magnitude()
      
   def angle(self, b : "Vector") -> float:
     """Calculate the angle between two vector

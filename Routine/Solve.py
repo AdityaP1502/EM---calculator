@@ -1,6 +1,7 @@
 from math import cos, sin
 from Math.Calculator import Calculator
 from Math.Vector import Vector
+from Math.Circle import Circle
 from Medium import Medium
 from UI.UI import UI
 class Solve():
@@ -173,6 +174,62 @@ class Solve():
       for (p, q) in vectors
     ] 
   
+  def __solveRoutine_mode5(self):
+    mode, impedance = self.data 
+    
+    if mode == "SERIES":
+      loc_stub = 0.25
+      init_point = impedance
+
+    elif mode == "PARALEL":
+      loc_stub = 0
+      init_point = Calculator.rotateComplex(impedance, 0.25, True)
+    
+    # Calculate stub distance in SC mode
+    # matching circle
+    
+    # find reflective from zn_c
+    r_real_circle = 1 / (init_point.real + 1)
+    r_imag_circle = 1 / init_point.imag
+    
+    real_circle = Circle(init_point.real * r_real_circle, 0, r_real_circle)
+    imag_circle = Circle(1, r_imag_circle, r_imag_circle)
+    
+    reflective_zn = [vec for vec in Circle.intersection(real_circle, imag_circle) if (int(vec.x) == 1 and int(vec.y) != 0 or int(vec.x) != 1)][0]
+    r = reflective_zn.mag
+    
+    distance = [] # in lambda
+    matching_circle = Circle(0.5, 0, 0.5)
+    
+    search_circle = Circle(0, 0, r)
+    zb = Circle.intersection(matching_circle, search_circle)
+    
+    if (len(zb) == 0): raise Exception("Can't find points, because matching cirle doesn't intersect with load")
+    
+    for i in range(len(zb)):
+      reflective = complex(zb[i].x, zb[i].y)
+      _, angle = Calculator.toPolar(reflective, "DEGREES")
+      if angle < 0:
+        angle = 180 - angle
+      
+      loc1 = angle / 720
+      
+      impedance = Calculator.fromReflectiveToImpedanceNormalized(reflective)
+      stub = 1 - impedance
+      reflective = Calculator.imaginaryImpedanceToReflective(stub)
+      
+      # Calculate distance
+      _, angle = Calculator.toPolar(reflective, "DEGREES")
+      if angle < 0:
+        angle = 180 - angle
+      loc2 = angle / 720
+      
+      distance_stub = Calculator.calculateTransmissionDistance(loc_stub, loc2)
+      distance_load =  Calculator.calculateTransmissionDistance(loc1, loc_stub)
+      distance.append([impedance, distance_stub, distance_load])
+    
+    self.result = distance
+
   def __getResult_mode2(self):
     # type hint
     self.result : list[list[Vector]]
@@ -199,7 +256,12 @@ class Solve():
       self.log.showResult(data_name="Medium Propagation at {}(polar)".format(i + 1), values=Calculator.toPolar(medium.propagation, "DEGREES"))
       self.log.showResult(data_name="Resisatnce at {}".format(i + 1), values=medium.resistance)
       self.log.showResult(data_name="Resisatnce at {}(polar)".format(i + 1), values=Calculator.toPolar(medium.resistance, "DEGREES"))
-      
+  
+  def __getResult_mode5(self):
+    for i in range(len(self.result)):
+      self.log.showResult(data_name="ds (point: {})".format(self.result[i][0]), values=self.result[i][1])
+      self.log.showResult(data_name="dl (point: {})".format(self.result[i][0]), values=self.result[i][2])
+    
   def solve(self):
     if (self.mode == 1):
       self.__solveRoutine_mode1()
@@ -214,4 +276,8 @@ class Solve():
       
     elif self.mode == 4:
       self.__getResult_mode4()
+      
+    elif self.mode == 5:
+      self.__solveRoutine_mode5()
+      self.__getResult_mode5()
       

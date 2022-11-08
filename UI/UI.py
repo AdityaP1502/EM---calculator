@@ -123,3 +123,7 @@ class UI(Color):
     """
   
     print("{}: {}".format(data_name, values))
+
+  def log(self, log : str):
+    print(log)
+  

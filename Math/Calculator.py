@@ -86,7 +86,22 @@ class Calculator():
     if angle_type.upper() == "RADIANS":
       return list(cmath.polar(z))
     
+  def rotateComplex(z : complex, theta : float, inLambda : bool = False) -> complex:
+    """Rotate complex value by theta radian
 
+    Args:
+        z (complex): complex number
+        theta (float): Angle in radian
+        inLambda(bool): Theta in lambda
+
+    Returns:
+       complex : z rotated by theta radian ccw
+    """
+    if (inLambda):
+      theta = 4 * theta * pi
+    
+    return z * cmath.exp(1j*theta)
+  
   # MEDIUM PARAMETER
   @staticmethod
   def calculateDistance(dist, propagation):
@@ -127,9 +142,24 @@ class Calculator():
     return (impedance - impedance_intrinsic) / (impedance + impedance_intrinsic)
   
   @staticmethod
+  def fromReflectiveToImpedanceNormalized(reflective : complex):
+    return (1 + reflective) / (1 - reflective)
+  
+  @staticmethod
   def fromReflectiveToImpedance(reflective : complex, impedance_intrinsic : complex):
-    f = (1 + reflective) / (1 - reflective)
-    return impedance_intrinsic * f
+    return impedance_intrinsic * Calculator.fromReflectiveToImpedanceNormalized(reflective)
+  
+  @staticmethod
+  def imaginaryImpedanceToReflective(impedance_imaginary : complex) -> complex:
+    p = impedance_imaginary.imag
+    p_squared = p ** 2
+    p_squared_add_one = p_squared + 1
+    
+    # Calculate intersection between imaginary cirlce and unit circle
+    x = (p_squared - 1) / p_squared_add_one
+    y = (2 * p) / p_squared_add_one
+    
+    return complex(x, y)
   
   # Reflected and Transmitted Amplitude
   @staticmethod
@@ -195,3 +225,10 @@ class Calculator():
   def getCriticalAngle(medium_1_propagation : float, medium_2_propagation : float) -> float:
     return asin(medium_2_propagation.imag / medium_1_propagation.imag)
   
+  @staticmethod
+  def calculateTransmissionDistance(loc1 : float, loc2 : float):
+    # Distance of rotation from loc1 to loc2 in cw
+    if (loc2 < loc1):
+      return 0.5 - (loc1 - loc2)
+    
+    return loc2 - loc1      
