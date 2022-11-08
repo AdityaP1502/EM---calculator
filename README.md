@@ -13,7 +13,7 @@ To install, just clone this repository
 ```
 git clone https://github.com/AdityaP1502/EM---calculator
 ```
-__No extra packages are needed__
+__No extra packages are needed__, unless you want to run experimental features. For experimental features, numpy is needed. 
 # Run
 to run the program, go to EM--calculator dir and run
 ```
@@ -22,5 +22,5 @@ python start.py
 __Notes__ : Tested on python 3.10.2. It seemed there are error on type alias when using python 3.8.10. So probably won't work for any older version too. 
 # Further Works
 1. Complete the documentation
-2. Support for incidince angle greater than critical angle (mode 3)
-3. Support for a much more genereal surface, not just plane
+2. Support for a much more genereal surface, not just plane, will be added in experimental mode. (Side)
+3. Mode for section 7 calculation : Transmission Lines. (Main)
