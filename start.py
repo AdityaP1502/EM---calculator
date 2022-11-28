@@ -10,7 +10,7 @@ if __name__ == "__main__":
   
   try:
     mode, data = Routine.init(ui)
-  except ValueError as e:
+  except Exception as e:
     print("Oops...Something is wrong when init calculation.")
     print(e)
     print("Exiting!")
