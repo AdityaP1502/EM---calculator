@@ -46,7 +46,7 @@ class Solve():
       last_total_impedance = Calculator.fromReflectiveToImpedance(reflection_coef_inter[i - 1], mediums[i].resistance)
          
     return reflection_coeff[:-1], reflection_coef_inter[:-1]
-  
+    
   # routine
   def __solveRoutine_mode1(self):
     n, ampl, mediums, reflection, inter_reflection = self.data
@@ -176,26 +176,24 @@ class Solve():
   
   def __solveRoutine_mode5(self):
     mode, impedance = self.data 
+    loc_stub = 0.25
     
-    if mode == "SERIES":
-      loc_stub = 0.25
-      init_point = impedance
-
-    elif mode == "PARALEL":
-      loc_stub = 0
-      init_point = Calculator.rotateComplex(impedance, 0.25, True)
+    init_point = impedance
     
     # Calculate stub distance in SC mode
     # matching circle
     
-    # find reflective from zn_c
-    r_real_circle = 1 / (init_point.real + 1)
-    r_imag_circle = 1 / init_point.imag
+    reflective_zn = Circle.findReflectiveFromImpedanceNormalized(init_point)
     
-    real_circle = Circle(init_point.real * r_real_circle, 0, r_real_circle)
-    imag_circle = Circle(1, r_imag_circle, r_imag_circle)
-    
-    reflective_zn = [vec for vec in Circle.intersection(real_circle, imag_circle) if (int(vec.x) == 1 and int(vec.y) != 0 or int(vec.x) != 1)][0]
+    if (mode == "PARALEL"):
+      complex_reflective_zn = complex(reflective_zn.x, reflective_zn.y)
+      complex_reflective_zn = Calculator.rotateComplex(complex_reflective_zn, 0.25, True)
+      
+      reflective_zn.x = complex_reflective_zn.real
+      reflective_zn.y = complex_reflective_zn.imag
+      
+      loc_stub = 0
+      
     r = reflective_zn.mag
     
     distance = [] # in lambda
@@ -230,6 +228,26 @@ class Solve():
     
     self.result = distance
 
+  def __solveRoutine_mode6(self):
+    Zl, freq_sample, dist, L, C = self.data
+    res = []
+    
+    for freq in freq_sample:
+      beta = Calculator.transmissionLineBeta(freq, L, C)
+      dl = Calculator.getDistanceInLambda(dist, beta)
+      reflective_zn = Circle.findReflectiveFromImpedanceNormalized(Zl)
+      
+      complex_reflective_zn  = complex(reflective_zn.x, reflective_zn.y)
+      complex_reflective_zn = Calculator.rotateComplex(complex_reflective_zn, dl, True)
+      
+      Zb = Calculator.fromReflectiveToImpedanceNormalized(complex_reflective_zn)
+      alpha = Zb.real
+      swr = Calculator.SWR(alpha)
+      
+      res.append((freq, swr))
+    
+    self.result = res
+      
   def __getResult_mode2(self):
     # type hint
     self.result : list[list[Vector]]
@@ -261,7 +279,18 @@ class Solve():
     for i in range(len(self.result)):
       self.log.showResult(data_name="ds (point: {})".format(self.result[i][0]), values=self.result[i][1])
       self.log.showResult(data_name="dl (point: {})".format(self.result[i][0]), values=self.result[i][2])
+  
+  def __getResult_mode6(self):
+    content = "freq(Hz),SWR\n"
+    content_str = [("{},{}").format(freq, swr) for freq, swr in self.result]
+    content_str = "\n".join(content_str)
+    content += content_str
+      
+    # save data to csv
+    with open("swr.csv", "w") as f:
+      f.write(content)
     
+      
   def solve(self):
     if (self.mode == 1):
       self.__solveRoutine_mode1()
@@ -280,4 +309,8 @@ class Solve():
     elif self.mode == 5:
       self.__solveRoutine_mode5()
       self.__getResult_mode5()
+      
+    elif self.mode == 6:
+      self.__solveRoutine_mode6()
+      self.__getResult_mode6()
       
