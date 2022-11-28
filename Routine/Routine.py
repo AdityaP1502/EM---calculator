@@ -123,6 +123,32 @@ class Routine():
     return Routine.__readVector(ui, "Wave Direction")
   
   @staticmethod
+  def __readFrequencyBandwidth(ui : UI) -> list:
+    data_name = "Frequency bandwidth"
+    parameters = [["min_frequency", "in Hz"], ["increment", "in Hz"], ["max_frequency", "in Hz"]]
+    extra_info_prepend = ""
+    extra_info_append = ""
+    data = ui.getData(data_name, extra_info_prepend, extra_info_append, parameters)
+    data_number = map(lambda x: float(x), data)
+    return list(data_number)    
+  
+  @staticmethod
+  def __readLength(ui : UI) -> float:
+    prompt = "Distance between stub and load at work frequency(in m)."
+    dist = ui.read(prompt)
+    return float(dist)
+  
+  @staticmethod
+  def __readTransmissionLineParameter(ui):
+    data_name = "Transmission Parameter"
+    parameters = [["L", "in H"], ["C", "in F"]]
+    extra_info_prepend = ""
+    extra_info_append = ""
+    data = ui.getData(data_name, extra_info_prepend, extra_info_append, parameters)
+    L, C = map(lambda x: float(x), data)
+    return L, C
+    
+  @staticmethod
   def __Mode1(ui : UI):
     n, ampl, mediums = Routine.__Mode2(ui)
     reflection, inter_reflection = Routine.__readReflectionCoefficient(ui, n)
@@ -183,6 +209,25 @@ class Routine():
     mode = Routine.__getMode(ui)
     
     return mode, load / intrinsic_impedance
+
+  @staticmethod
+  def __Mode6(ui: UI):
+    load = Routine.__readLoad(ui)
+    load = complex(load[0], load[1])
+    intrinsic_impedance = Routine.__readIntrinsicImpedance(ui)
+    L, C = Routine.__readTransmissionLineParameter(ui)
+    
+    min_freq, increment, max_freq = Routine.__readFrequencyBandwidth(ui)
+    freq = min_freq
+    
+    freq_sample = []
+    while (freq < max_freq):
+      freq_sample.append(freq)
+      freq += increment
+      
+    dist = Routine.__readLength(ui)
+    
+    return load / intrinsic_impedance, freq_sample, dist, L, C
     
   @staticmethod
   def init(ui : UI) -> list[float]:
@@ -202,7 +247,8 @@ class Routine():
       "Oblique Incidence", 
       "Calculate medium propagation and impedance", 
       "Stub distance parameter in transmission lines",
-      ]
+      "SWR vs Frequency"
+    ]
     mode = ui.getOptions(prompt, options)
     
     if (mode == 1):
@@ -219,6 +265,9 @@ class Routine():
       
     elif (mode == 5):
       data = Routine.__Mode5(ui)
+      
+    elif (mode == 6):
+      data = Routine.__Mode6(ui)
       
     return mode, list(data)
   
