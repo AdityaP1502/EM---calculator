@@ -29,6 +29,22 @@ class Circle():
     
     return [a.center + Vector(intersect_x1, intersect_y1, 0),a.center + Vector(intersect_x2, intersect_y2, 0)]
   
+  @staticmethod
+  def findReflectiveFromImpedanceNormalized(Zl : complex):
+    # find reflective from zn_c
+    r_real_circle = 1 / (Zl.real + 1)
+    r_imag_circle = 1 / Zl.imag
+    
+    real_circle = Circle(Zl.real * r_real_circle, 0, abs(r_real_circle))
+    imag_circle = Circle(1, r_imag_circle, abs(r_imag_circle))
+    
+    reflective_zn = [vec for vec in Circle.intersection(real_circle, imag_circle) if (int(vec.x) == 1 and int(vec.y) != 0 or int(vec.x) != 1)]
+    
+    if (len(reflective_zn) == 0): 
+      raise Exception("Cannot find intersection")
+    
+    reflective_zn = reflective_zn[0]
+    return reflective_zn
 
 if __name__ == "__main__":
   a = Circle(0, 0, 1)
