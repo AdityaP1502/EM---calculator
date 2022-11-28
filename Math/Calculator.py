@@ -1,7 +1,6 @@
 import cmath
 from math import asin, cos, degrees, pi, radians, sin, sqrt, atan
 
-
 class Calculator():
   """
     Class for implementing and solving EM equations
@@ -86,6 +85,10 @@ class Calculator():
     if angle_type.upper() == "RADIANS":
       return list(cmath.polar(z))
     
+  @staticmethod
+  def lambdaToAngle(lam : float):
+    return 4 * pi * lam
+  
   def rotateComplex(z : complex, theta : float, inLambda : bool = False) -> complex:
     """Rotate complex value by theta radian
 
@@ -98,7 +101,7 @@ class Calculator():
        complex : z rotated by theta radian ccw
     """
     if (inLambda):
-      theta = 4 * theta * pi
+      theta = Calculator.lambdaToAngle(theta)
     
     return z * cmath.exp(1j*theta)
   
@@ -226,9 +229,34 @@ class Calculator():
     return asin(medium_2_propagation.imag / medium_1_propagation.imag)
   
   @staticmethod
+  def getDistanceInLambda(dist, beta):
+    # dist in lambda  = dist / lambda
+    # lambda = 2 * pi / beta
+    return (dist * beta) / (2 * pi)
+  
+  @staticmethod
   def calculateTransmissionDistance(loc1 : float, loc2 : float):
     # Distance of rotation from loc1 to loc2 in cw
     if (loc2 < loc1):
       return 0.5 - (loc1 - loc2)
     
-    return loc2 - loc1      
+    return loc2 - loc1   
+  
+  @staticmethod
+  def transmissionLineBeta(freq, L, C):
+    return Calculator.freqToOmega(freq) * sqrt(L * C)
+  
+  @staticmethod
+  def SWR(alpha: float):
+    # to find SWR
+    # first find the real value of Zb
+    # by rotating Zl to Zb cw by dl
+    # dl in lambda -> dl in theta = dl (360 / 0.5)
+    
+
+    reflective = (1 - alpha) / (1 + alpha)
+    swr = (1 + abs(reflective)) / (1 - abs(reflective))
+    
+    return swr
+    
+    
